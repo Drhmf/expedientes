@@ -263,16 +263,74 @@ window.confirmarEnvio = async function() {
     formSolicitud.reset();
     hide(optativasWrapper);
     
-    // Redirigir a inicio después de 8 segundos
-    setTimeout(function() {
-      volverAlInicio();
-    }, 8000);
+    // Mostrar banner superior con el código y descargar PDF automáticamente
+    mostrarCodigoArriba(codigo);
+    try { descargarComprobante(codigo, data); } catch(e) { console.warn('No se pudo descargar automáticamente el PDF:', e); }
+    // Llevar al usuario al inicio visualmente
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(_) { window.scrollTo(0,0); }
   } catch(err){
     console.error(err);
     resultadoSolicitud.textContent='Error guardando la solicitud. Intente nuevamente.';
     resultadoSolicitud.classList.add('error');
   }
 };
+
+// Banner superior para mostrar el código destacado
+function mostrarCodigoArriba(codigo) {
+  var existente = document.getElementById('codigoBanner');
+  if (!existente) {
+    var banner = document.createElement('div');
+    banner.id = 'codigoBanner';
+    banner.innerHTML = '<div class="codigo-banner-inner">' +
+      '<span class="codigo-banner-label">Código de Ticket:</span>' +
+      '<span class="codigo-banner-value">' + codigo + '</span>' +
+      '<button type="button" class="codigo-banner-copy" onclick="copiarCodigoTicket()">Copiar</button>' +
+      '<button type="button" class="codigo-banner-close" onclick="this.parentElement.parentElement.remove()">✖</button>' +
+    '</div>';
+    // Insertar al inicio del body
+    var body = document.body;
+    if (body.firstChild) body.insertBefore(banner, body.firstChild); else body.appendChild(banner);
+  } else {
+    var valueEl = existente.querySelector('.codigo-banner-value');
+    if (valueEl) valueEl.textContent = codigo;
+  }
+}
+
+// Copiar código al portapapeles con feedback visual
+window.copiarCodigoTicket = function() {
+  var valorEl = document.querySelector('#codigoBanner .codigo-banner-value');
+  if (!valorEl) return;
+  var texto = valorEl.textContent ? valorEl.textContent.trim() : '';
+  var btn = document.querySelector('#codigoBanner .codigo-banner-copy');
+  var ok = function(){
+    if (btn) {
+      var old = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      btn.disabled = true;
+      setTimeout(function(){ btn.textContent = old; btn.disabled = false; }, 1500);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(ok).catch(function(){ fallbackCopy(texto, ok); });
+  } else {
+    fallbackCopy(texto, ok);
+  }
+};
+
+function fallbackCopy(texto, onDone) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = texto;
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (onDone) onDone();
+  } catch(e) { console.warn('No se pudo copiar:', e); }
+}
 
 formConsulta.addEventListener('submit', async function(e) {
   e.preventDefault();

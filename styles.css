@@ -286,3 +286,27 @@ input:focus, select:focus {
   .codigo-destacado {font-size:1.1rem; padding:.5rem .75rem;}
   button {font-size:.9rem;}
 }
+
+/* BANNER SUPERIOR CÓDIGO */
+#codigoBanner {
+  position: sticky;
+  top: 0;
+  z-index: 3000;
+  background: #ffc107;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+.codigo-banner-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: .75rem 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: .75rem;
+  align-items: center;
+}
+.codigo-banner-label {font-weight:700; color:#3a3a3a;}
+.codigo-banner-value {font-family: monospace; font-size:1.1rem; letter-spacing:2px; color:#1a1a1a;}
+.codigo-banner-copy {border:none; background:#1976d2; color:#fff; padding:.4rem .75rem; border-radius:6px; cursor:pointer; font-weight:600;}
+.codigo-banner-copy:hover {background:#1565c0;}
+.codigo-banner-close {border:none; background:#00000022; color:#222; padding:.35rem .6rem; border-radius:6px; cursor:pointer;}
+.codigo-banner-close:hover {background:#00000033;}
